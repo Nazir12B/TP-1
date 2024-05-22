@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 import cv2
 
  
+face_detector= cv2.CascadeClassifier('haarcascade_frontalface_alt2.xml')
 
-
+c= 50
 async def fetch_netatmo_data():
     load_dotenv()
     variable = os.getenv('API_KEY')
@@ -34,10 +35,18 @@ async def fetch_netatmo_data():
                         capture = cv2.VideoCapture(vpn)
                         
                         while True:
-
+ 
                             ret, frame= capture.read()
+                            gray=cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+                            face= face_detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(c,c))
+
+                            for x, y, w, h in face:
+                                cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0), 2)
+
                             if ret:
                                     cv2.imshow('Camera Feed', frame)
+
                                     if cv2.waitKey(1) & 0xFF == ord('q'):
                                         break
                             else:
